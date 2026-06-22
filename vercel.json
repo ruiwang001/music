@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "installCommand": "npm install --workspace apps/api --workspace apps/pwa --workspace apps/admin --workspace packages/shared --include-workspace-root",
+  "buildCommand": "npm --workspace apps/api run build && npm --workspace apps/pwa run build && npm --workspace apps/admin run build && mkdir -p apps/pwa/dist/admin && cp -R apps/admin/dist/* apps/pwa/dist/admin/",
+  "outputDirectory": "apps/pwa/dist",
+  "functions": {
+    "api/index.ts": {
+      "maxDuration": 300,
+      "memory": 1024,
+      "includeFiles": "{apps/api/dist/**,infra/supabase/schema.sql,node_modules/@electric-sql/pglite/dist/**}"
+    },
+    "api/[...path].ts": {
+      "maxDuration": 300,
+      "memory": 1024,
+      "includeFiles": "{apps/api/dist/**,infra/supabase/schema.sql,node_modules/@electric-sql/pglite/dist/**}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/((?!api/.*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

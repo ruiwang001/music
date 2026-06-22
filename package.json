@@ -1,0 +1,50 @@
+{
+  "name": "melody-ai-music-platform",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PWA AI music creation product powered by MiniMax Music API, Melody Points, subscriptions, and Supabase.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:pwa",
+    "dev:api": "npm --workspace apps/api run start:dev",
+    "dev:pwa": "npm --workspace apps/pwa run dev",
+    "build:pwa": "npm --workspace apps/pwa run build",
+    "dev:admin": "npm --workspace apps/admin run dev",
+    "qa:auth": "node scripts/qa-auth-security.mjs",
+    "qa:guest": "node scripts/qa-guest-flow.mjs",
+    "qa:iap": "node scripts/qa-iap-security.mjs",
+    "qa:multi-publish": "node scripts/qa-multi-publish-flow.mjs",
+    "qa:challenge-reward": "node scripts/qa-challenge-reward-flow.mjs",
+    "qa:admin": "node scripts/qa-admin-flow.mjs",
+    "qa:schema": "node scripts/qa-schema-clean.mjs",
+    "qa:online": "node scripts/qa-online-smoke.mjs",
+    "qa:production-async": "node scripts/qa-production-async-generate.mjs",
+    "qa:core:repeat": "node scripts/qa-repeat-core.mjs",
+    "qa:core:mock": "node scripts/qa-core-flow.mjs --mock",
+    "qa:core:real": "node scripts/qa-core-flow.mjs --real",
+    "typecheck": "npm --workspaces --if-present run typecheck",
+    "lint": "npm --workspaces --if-present run lint"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "@nestjs/common": "^11.1.27",
+    "@nestjs/core": "^11.1.27",
+    "@nestjs/platform-express": "^11.1.27",
+    "@xmldom/xmldom": "^0.8.13",
+    "glob": "^10.5.0",
+    "js-yaml": "^4.2.0",
+    "postcss": "^8.5.15",
+    "tar": "^7.5.16",
+    "uuid": "^11.1.1"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.1.27",
+    "@nestjs/core": "^11.1.27",
+    "@nestjs/platform-express": "^11.1.27"
+  }
+}

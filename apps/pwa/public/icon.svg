@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="40%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="#A8FFD8"/>
+      <stop offset="42%" stop-color="#59FFC8"/>
+      <stop offset="100%" stop-color="#041A15"/>
+    </radialGradient>
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#02110D"/>
+  <path d="M-20 312C96 180 207 349 342 195c76-87 137-60 190-22v246H-20z" fill="url(#g)" opacity=".72" filter="url(#blur)"/>
+  <circle cx="256" cy="256" r="132" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.18)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="74" fill="#05251D" stroke="#59FFC8" stroke-opacity=".44" stroke-width="6"/>
+  <circle cx="256" cy="256" r="28" fill="#FFD87A"/>
+  <path d="M151 336c26-18 44-32 59-73 12-34 21-73 66-88-23 30-29 57-23 82 8 36 40 50 92 54-46 29-91 33-130 13-23-12-43-9-64 12Z" fill="#A8FFD8"/>
+</svg>

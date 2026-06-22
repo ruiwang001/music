@@ -1,0 +1,50 @@
+{
+  "name": "Green Sonic Gallery",
+  "short_name": "Green Sonic",
+  "description": "把一句灵感变成一首歌，创作 AI 音乐、公开作品并参与创作者奖励。",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#041A15",
+  "background_color": "#02110D",
+  "categories": ["music", "entertainment", "creativity"],
+  "shortcuts": [
+    {
+      "name": "立即创作",
+      "short_name": "创作",
+      "description": "打开 Green Sonic 创作页，输入灵感生成歌曲。",
+      "url": "/?tab=home",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "音乐广场",
+      "short_name": "广场",
+      "description": "浏览公开 AI 音乐作品。",
+      "url": "/?tab=gallery",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "创作者奖励",
+      "short_name": "奖励",
+      "description": "查看 Melody Points、任务和 USDC 申请状态。",
+      "url": "/?tab=rewards",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

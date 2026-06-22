@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: melody-ai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: melody_ai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - melody_ai_pgdata:/var/lib/postgresql/data
+      - ./supabase/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d melody_ai"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  melody_ai_pgdata:

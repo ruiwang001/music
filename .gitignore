@@ -1,0 +1,35 @@
+node_modules
+.npm-cache
+.android-sdk
+.android-avd
+.gradle-cache
+.pglite
+.pglite*
+dist
+build
+.expo
+.turbo
+.DS_Store
+coverage
+*.log
+hs_err_pid*.log
+
+# Local secrets and deployment links
+.env
+.env.*
+!.env.example
+!apps/**/.env.example
+.vercel
+
+# Retired native/mobile build outputs
+apps/mobile/ios
+apps/mobile/android
+apps/mobile
+outputs
+*.apk
+*.idsig
+emulator.bak-*
+work/
+
+# Independent prototype demo, deployed separately
+prototype-demo/
