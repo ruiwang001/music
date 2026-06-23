@@ -17,6 +17,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "/api?path=/:path*"
+    },
+    {
       "source": "/admin/:path*",
       "destination": "/admin/index.html"
     },
