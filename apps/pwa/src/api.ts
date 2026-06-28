@@ -230,6 +230,7 @@ const SESSION_KEY = "green-sonic:pwa-session";
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 const API_BASE_URL = resolveRuntimeBaseUrl(normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "/api"));
 const REQUEST_TIMEOUT_MS = 25000;
+const GENERATION_CREATE_TIMEOUT_MS = 90000;
 const GENERATION_TASK_TIMEOUT_MS = 330000;
 
 type ApiRequestInit = RequestInit & {
@@ -298,7 +299,9 @@ export async function getMe(): Promise<AuthSession> {
 export async function generateMusic(payload: GenerateMusicRequest): Promise<GenerateMusicResponse> {
   const response = await request<MusicTask | GenerateMusicResponse>("/music/generate", {
     method: "POST",
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    timeoutMs: GENERATION_CREATE_TIMEOUT_MS,
+    timeoutMessage: "生成服务连接较慢，正在尝试恢复任务状态。"
   });
   return "task" in response ? response : { task: response };
 }

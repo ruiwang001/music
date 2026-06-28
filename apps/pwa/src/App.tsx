@@ -302,11 +302,40 @@ export default function App() {
         void pollTask(response.task.id);
       }
     } catch (unknown) {
+      if (unknown instanceof ApiError && unknown.status === 0 && (await recoverPendingGenerationAfterTimeout())) {
+        return;
+      }
       pendingMvDraftRef.current = null;
       setActiveTab("home");
       showError(unknown);
     } finally {
       setBusy(null);
+    }
+  }
+
+  async function recoverPendingGenerationAfterTimeout(): Promise<boolean> {
+    try {
+      showMessage("生成请求仍在同步，我正在帮你检查是否已创建任务。");
+      const [nextTasks, nextSongs] = await Promise.all([getMyMusicTasks(), getMySongs()]);
+      setTasks(nextTasks);
+      setSongs(nextSongs);
+      const candidate = findRecoverableGenerationTask(nextTasks, form);
+      if (!candidate) {
+        return false;
+      }
+
+      setCurrentTask(candidate);
+      if (candidate.status === "succeeded") {
+        await completeTask(candidate);
+        return true;
+      }
+
+      setActiveTab("generating");
+      showMessage("已找到生成任务，继续为你等待结果。");
+      void pollTask(candidate.id);
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -327,9 +356,9 @@ export default function App() {
           return;
         }
       } catch (unknown) {
-        if (unknown instanceof ApiError && unknown.status === 0 && transientFailures < 4) {
+        if (unknown instanceof ApiError && (unknown.status === 0 || unknown.status === 404) && transientFailures < 12) {
           transientFailures += 1;
-          showMessage("线上连接短暂中断，正在继续等待生成结果。");
+          showMessage(unknown.status === 404 ? "任务状态正在同步，继续为你等待生成结果。" : "线上连接短暂中断，正在继续等待生成结果。");
           continue;
         }
         showError(unknown);
@@ -1143,6 +1172,35 @@ export default function App() {
         </nav>
       </div>
     </AuroraFrame>
+  );
+}
+
+const RECOVERABLE_GENERATION_WINDOW_MS = 15 * 60 * 1000;
+
+function findRecoverableGenerationTask(tasks: MusicTask[], form: GenerateMusicRequest): MusicTask | null {
+  const now = Date.now();
+  const theme = form.theme.trim();
+  const expectedTitle = (form.title?.trim() || titleFromTheme(form.theme)).trim();
+  const recoverableTasks = tasks.filter((task) => {
+    if (task.status !== "queued" && task.status !== "generating" && task.status !== "succeeded") {
+      return false;
+    }
+
+    const createdAt = new Date(task.createdAt).getTime();
+    return !Number.isFinite(createdAt) || now - createdAt <= RECOVERABLE_GENERATION_WINDOW_MS;
+  });
+
+  return (
+    recoverableTasks.find((task) => {
+      const taskTitle = task.title?.trim() ?? "";
+      const taskPrompt = (task.prompt || task.theme || "").trim();
+      return (
+        (expectedTitle && taskTitle === expectedTitle) ||
+        (theme.length >= 4 && Boolean(taskPrompt) && (taskPrompt.includes(theme) || theme.includes(taskPrompt)))
+      );
+    }) ??
+    recoverableTasks[0] ??
+    null
   );
 }
 
