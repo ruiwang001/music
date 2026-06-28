@@ -197,9 +197,7 @@ export class MusicService {
       };
     }
 
-    if (!shouldRunGenerationOnPoll()) {
-      runInBackground(`music-task:${task.id}`, () => this.runGenerationTask(userId, task.id, dto, lyricsOptimizer));
-    }
+    runInBackground(`music-task:${task.id}`, () => this.runGenerationTask(userId, task.id, dto, lyricsOptimizer));
 
     return {
       task: mapTask(task),
@@ -207,11 +205,17 @@ export class MusicService {
     };
   }
 
-  private async runGenerationTask(userId: string, taskId: string, dto: GenerateMusicDto, lyricsOptimizer: boolean): Promise<void> {
+  private async runGenerationTask(
+    userId: string,
+    taskId: string,
+    dto: GenerateMusicDto,
+    lyricsOptimizer: boolean,
+    options: { recoverStale?: boolean } = {}
+  ): Promise<void> {
     let miniMaxLogWritten = false;
 
     try {
-      const claimed = await this.db.one<{ id: string }>(
+      let claimed = await this.db.one<{ id: string }>(
         `update music_tasks
          set status = 'generating',
              started_at = now(),
@@ -219,10 +223,25 @@ export class MusicService {
              error_message = null
          where id = $1
            and user_id = $2
-           and status in ('queued', 'generating')
+           and status = 'queued'
          returning id`,
         [taskId, userId]
       );
+      if (!claimed && options.recoverStale) {
+        claimed = await this.db.one<{ id: string }>(
+          `update music_tasks
+           set status = 'generating',
+               started_at = now(),
+               error_code = null,
+               error_message = null
+           where id = $1
+             and user_id = $2
+             and status = 'generating'
+             and coalesce(started_at, updated_at, created_at) < $3
+           returning id`,
+          [taskId, userId, new Date(Date.now() - generationStaleAfterMs())]
+        );
+      }
       if (!claimed) {
         return;
       }
@@ -347,18 +366,15 @@ export class MusicService {
     }
 
     if (shouldRunGenerationOnPoll() && task.status === "queued") {
-      await this.runGenerationTask(userId, task.id, dtoFromTask(task), task.lyrics_optimizer);
-      task = await this.findTask(userId, taskId);
+      const queuedTask = task;
+      runInBackground(`music-task:${queuedTask.id}`, () =>
+        this.runGenerationTask(userId, queuedTask.id, dtoFromTask(queuedTask), queuedTask.lyrics_optimizer)
+      );
     } else if (isStaleGenerationTask(task)) {
-      if (shouldRunGenerationOnPoll()) {
-        await this.runGenerationTask(userId, task.id, dtoFromTask(task), task.lyrics_optimizer);
-        task = await this.findTask(userId, taskId);
-      } else {
-        const staleTask = task;
-        runInBackground(`music-task-recover:${staleTask.id}`, () =>
-          this.runGenerationTask(userId, staleTask.id, dtoFromTask(staleTask), staleTask.lyrics_optimizer)
-        );
-      }
+      const staleTask = task;
+      runInBackground(`music-task-recover:${staleTask.id}`, () =>
+        this.runGenerationTask(userId, staleTask.id, dtoFromTask(staleTask), staleTask.lyrics_optimizer, { recoverStale: true })
+      );
     }
 
     if (!task) {
