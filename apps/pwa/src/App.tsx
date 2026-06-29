@@ -919,10 +919,13 @@ export default function App() {
       <div className="app-shell" style={{ "--ui-scale": fontScale } as CSSProperties}>
         <header className="topbar">
           <button className="brand profile-trigger" type="button" onClick={() => setProfileOpen(true)} aria-label="打开个人中心">
-            <span className="brand-mark">G</span>
+            <span className="brand-mark">
+              G
+              <em>我的</em>
+            </span>
             <span>
               <strong>Green Sonic Gallery</strong>
-              <small>{displayNameLabel(session.displayName)} · {planLabel(session.plan)}</small>
+              <small>{displayNameLabel(session.displayName)} · {planLabel(session.plan)} · 点击查看</small>
             </span>
           </button>
           <div className="topbar-actions">
