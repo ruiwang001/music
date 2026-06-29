@@ -1290,28 +1290,6 @@ function HomePage({
           作品标题
           <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="例如：森林来信" />
         </label>
-        <div className="quick-generate-block">
-          <div className="cost-strip">
-            <span>本次生成</span>
-            <strong>{MV_FEATURE_ENABLED && mvEnabled ? "歌曲不限次数 · MV 测试开放" : "测试期不限次数"}</strong>
-            <button type="button" onClick={() => setMoreOptionsOpen(!moreOptionsOpen)}>
-              {moreOptionsOpen ? "收起选项" : "更多选项"}
-            </button>
-          </div>
-          <button className="liquid-button" type="submit" disabled={!canGenerate || busy}>
-            {busy ? busyLabel : MV_FEATURE_ENABLED && mvEnabled ? "生成歌曲 + 准备 MV" : "生成歌曲"}
-          </button>
-        </div>
-        {moreOptionsOpen && (
-          <div className="advanced-options">
-            <button type="button" className={form.lyricsOptimizer ? "selected" : ""} onClick={() => setForm({ ...form, lyricsOptimizer: !form.lyricsOptimizer })}>
-              歌词智能优化
-            </button>
-            <button type="button" onClick={() => onNotice("版权检测已内置：当前版本禁止上传参考音乐，后续会开放更完整的授权检测报告。")}>
-              版权检测 · 禁止参考侵权音乐
-            </button>
-          </div>
-        )}
         <ControlGroup label="风格" compact>
           {styleOptions.map((style) => (
             <button key={style} className={`glass-pill ${form.style === style ? "selected" : ""}`} type="button" onClick={() => setForm({ ...form, style })}>
@@ -1334,6 +1312,28 @@ function HomePage({
             纯音乐
           </button>
         </div>
+        <div className="quick-generate-block">
+          <div className="cost-strip">
+            <span>本次生成</span>
+            <strong>{MV_FEATURE_ENABLED && mvEnabled ? "歌曲不限次数 · MV 测试开放" : "测试期不限次数"}</strong>
+            <button type="button" onClick={() => setMoreOptionsOpen(!moreOptionsOpen)}>
+              {moreOptionsOpen ? "收起选项" : "更多选项"}
+            </button>
+          </div>
+          <button className="liquid-button" type="submit" disabled={!canGenerate || busy}>
+            {busy ? busyLabel : MV_FEATURE_ENABLED && mvEnabled ? "生成歌曲 + 准备 MV" : "生成歌曲"}
+          </button>
+        </div>
+        {moreOptionsOpen && (
+          <div className="advanced-options">
+            <button type="button" className={form.lyricsOptimizer ? "selected" : ""} onClick={() => setForm({ ...form, lyricsOptimizer: !form.lyricsOptimizer })}>
+              歌词智能优化
+            </button>
+            <button type="button" onClick={() => onNotice("版权检测已内置：当前版本禁止上传参考音乐，后续会开放更完整的授权检测报告。")}>
+              版权检测 · 禁止参考侵权音乐
+            </button>
+          </div>
+        )}
         {form.mode === "vocal" && (
           <label className="input-label">
             歌词
