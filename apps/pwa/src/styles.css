@@ -2287,6 +2287,10 @@ select:focus {
   box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.035);
 }
 
+.marketplace-cover-shell {
+  position: relative;
+}
+
 .marketplace-cover {
   width: 100%;
   border: 0;
@@ -2312,6 +2316,73 @@ select:focus {
   box-shadow: 0 12px 30px rgba(89, 255, 200, 0.24);
 }
 
+.cover-social-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.cover-social {
+  min-width: 58px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 7px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--text);
+  background: rgba(2, 17, 13, 0.66);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.cover-social span {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.cover-social small {
+  color: rgba(244, 241, 232, 0.86);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.cover-social.like {
+  border-color: rgba(255, 118, 139, 0.38);
+}
+
+.cover-social.like span {
+  color: #ff6b86;
+  text-shadow: 0 0 18px rgba(255, 107, 134, 0.42);
+}
+
+.cover-social.comment span,
+.cover-social.share span {
+  color: rgba(244, 241, 232, 0.95);
+}
+
+.cover-social.favorite span {
+  color: var(--accent);
+}
+
+.cover-social.active {
+  color: #041a15;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+}
+
+.cover-social.active span,
+.cover-social.active small {
+  color: #041a15;
+  text-shadow: none;
+}
+
 .marketplace-card-body {
   display: grid;
   gap: 10px;
@@ -2329,32 +2400,131 @@ select:focus {
   line-height: 1.48;
 }
 
-.marketplace-card-body audio {
+.marketplace-player-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: 8px;
+  background: rgba(2, 17, 13, 0.48);
+}
+
+.marketplace-player-strip audio {
   width: 100%;
   height: 34px;
+  opacity: 0.9;
 }
 
-.marketplace-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.marketplace-actions button:not(.liquid-button) {
+.marketplace-play-button,
+.challenge-chip {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 999px;
-  padding: 10px 12px;
+  padding: 10px 13px;
   color: var(--text);
   background: rgba(255, 255, 255, 0.06);
-  font-size: 12px;
   font-weight: 900;
   cursor: pointer;
 }
 
-.marketplace-actions button.active {
+.marketplace-play-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   color: #041a15;
   border-color: transparent;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
+  box-shadow: 0 14px 34px rgba(89, 255, 200, 0.18);
+  white-space: nowrap;
+}
+
+.marketplace-card-footer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.challenge-chip {
+  color: var(--secondary);
+  background: rgba(89, 255, 200, 0.08);
+}
+
+.challenge-chip::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 7px;
+  background: var(--primary);
+  box-shadow: 0 0 14px rgba(89, 255, 200, 0.45);
+}
+
+.challenge-chip small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.social-library-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.social-library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.mini-song-collection {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: 12px;
+  background: rgba(2, 17, 13, 0.28);
+}
+
+.mini-song-collection h3 {
+  margin: 0 0 10px;
+}
+
+.mini-song-collection p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.mini-song-list {
+  display: grid;
+  gap: 8px;
+}
+
+.mini-song-list button {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 16px;
+  padding: 8px;
+  color: var(--text);
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.mini-song-list .cover-art {
+  border-radius: 14px;
+}
+
+.mini-song-list strong,
+.mini-song-list small {
+  display: block;
+}
+
+.mini-song-list small {
+  color: var(--muted);
+  margin-top: 3px;
 }
 
 .creator-center-hero {
@@ -3408,14 +3578,21 @@ select:focus {
     font-size: 22px;
   }
 
-  .marketplace-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .marketplace-player-strip {
+    grid-template-columns: 1fr;
   }
 
-  .marketplace-actions .liquid-button {
-    grid-column: 1 / -1;
-    text-align: center;
+  .marketplace-play-button {
+    justify-content: center;
+  }
+
+  .social-library-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cover-social {
+    min-width: 52px;
+    padding: 7px 9px;
   }
 
   .creator-center-hero {

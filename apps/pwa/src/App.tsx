@@ -881,6 +881,8 @@ export default function App() {
       ...marketplaceSongs.filter((song) => !seen.has(song.id))
     ];
   }, [feed, marketplaceSongs]);
+  const likedSongs = useMemo(() => marketplaceFeed.filter((song) => song.likedByMe), [marketplaceFeed]);
+  const favoriteSongs = useMemo(() => marketplaceFeed.filter((song) => song.favoritedByMe), [marketplaceFeed]);
 
   const shellStats = useMemo(
     () => [
@@ -1004,8 +1006,8 @@ export default function App() {
               onLike={handleToggleLike}
               onFavorite={handleToggleFavorite}
               onPlay={(song) => void handleTrackPlay(song.id)}
-              onPromote={handleOpenPromotion}
               onJoinChallenge={handleOpenChallengeFromSong}
+              onAudioError={(song) => showMessage(`《${song.title}》音频暂时不可用，请稍后再试。`)}
             />
           )}
           {activeTab === "challenge" && (
@@ -1046,6 +1048,8 @@ export default function App() {
               songs={songs}
               rewards={rewards}
               tasks={tasks}
+              likedSongs={likedSongs}
+              favoriteSongs={favoriteSongs}
               apiBase={getApiBaseUrl()}
               onOpen={openSong}
               onOpenRewards={() => setActiveTab("rewards")}
@@ -1630,8 +1634,8 @@ function GalleryPage({
   onLike,
   onFavorite,
   onPlay,
-  onPromote,
-  onJoinChallenge
+  onJoinChallenge,
+  onAudioError
 }: {
   feed: FeedItem[];
   busy: boolean;
@@ -1645,8 +1649,8 @@ function GalleryPage({
   onLike: (song: FeedItem) => void;
   onFavorite: (song: FeedItem) => void;
   onPlay: (song: FeedItem) => void;
-  onPromote: (song: FeedItem) => void;
   onJoinChallenge: (song: FeedItem) => void;
+  onAudioError: (song: FeedItem) => void;
 }) {
   const sections = [
     { title: "今日热门", body: "真实播放和收藏正在上升的 AI 歌曲。", songs: feed.filter((song, index) => (song as MarketplaceSong).lane === "hot" || index < 2) },
@@ -1710,8 +1714,8 @@ function GalleryPage({
                     onLike={onLike}
                     onFavorite={onFavorite}
                     onPlay={onPlay}
-                    onPromote={onPromote}
                     onJoinChallenge={onJoinChallenge}
+                    onAudioError={onAudioError}
                   />
                 ))}
               </div>
@@ -1733,8 +1737,8 @@ function MarketplaceCard({
   onLike,
   onFavorite,
   onPlay,
-  onPromote,
-  onJoinChallenge
+  onJoinChallenge,
+  onAudioError
 }: {
   song: FeedItem;
   currentUserId: string;
@@ -1745,8 +1749,8 @@ function MarketplaceCard({
   onLike: (song: FeedItem) => void;
   onFavorite: (song: FeedItem) => void;
   onPlay: (song: FeedItem) => void;
-  onPromote: (song: FeedItem) => void;
   onJoinChallenge: (song: FeedItem) => void;
+  onAudioError: (song: FeedItem) => void;
 }) {
   const creatorPoints = "creatorPoints" in song
     ? Number((song as MarketplaceSong).creatorPoints)
@@ -1754,10 +1758,50 @@ function MarketplaceCard({
 
   return (
     <article className="marketplace-card">
-      <button className="marketplace-cover" type="button" onClick={() => onOpen(song)}>
-        <CoverArt title={song.title} coverUrl={song.coverUrl} />
-        <span>播放</span>
-      </button>
+      <div className="marketplace-cover-shell">
+        <button className="marketplace-cover" type="button" onClick={() => onOpen(song)}>
+          <CoverArt title={song.title} coverUrl={song.coverUrl} />
+          <span>播放</span>
+        </button>
+        <div className="cover-social-actions" aria-label="作品快捷互动">
+          <button
+            className={`cover-social like ${song.likedByMe ? "active" : ""}`}
+            type="button"
+            onClick={() => onLike(song)}
+            aria-label={song.likedByMe ? "取消喜欢" : "喜欢这首歌"}
+          >
+            <span>♥</span>
+            <small>{formatCompact(song.likesCount)}</small>
+          </button>
+          <button
+            className="cover-social comment"
+            type="button"
+            onClick={() => onOpenComments(song)}
+            aria-label="查看评论"
+          >
+            <span>◌</span>
+            <small>{formatCompact(song.commentsCount)}</small>
+          </button>
+          <button
+            className={`cover-social favorite ${song.favoritedByMe ? "active" : ""}`}
+            type="button"
+            onClick={() => onFavorite(song)}
+            aria-label={song.favoritedByMe ? "取消收藏" : "收藏这首歌"}
+          >
+            <span>★</span>
+            <small>{song.favoritedByMe ? "已收藏" : "收藏"}</small>
+          </button>
+          <button
+            className="cover-social share"
+            type="button"
+            onClick={() => onShare(song)}
+            aria-label="分享歌曲"
+          >
+            <span>↗</span>
+            <small>分享</small>
+          </button>
+        </div>
+      </div>
       <div className="marketplace-card-body">
         <button className="creator-chip" type="button" onClick={() => onOpenCreator(song.userId)}>
           <span>{displayInitial(song.creatorName)}</span>
@@ -1772,19 +1816,17 @@ function MarketplaceCard({
           <span>{formatCompact(song.likesCount)} 点赞</span>
           <span>{formatPoints(creatorPoints)} 积分</span>
         </div>
-        <audio controls src={song.audioUrl} onPlay={() => onPlay(song)} />
-        <div className="marketplace-actions">
-          <button className="liquid-button compact" type="button" onClick={() => onOpen(song)}>播放</button>
-          <button type="button" className={song.favoritedByMe ? "active" : ""} onClick={() => onFavorite(song)}>
-            {song.favoritedByMe ? "已收藏" : "收藏"}
+        <div className="marketplace-player-strip">
+          <button className="marketplace-play-button" type="button" onClick={() => onOpen(song)}>
+            <span>▶</span>
+            播放详情
           </button>
-          <button type="button" className={song.likedByMe ? "active" : ""} onClick={() => onLike(song)}>
-            {song.likedByMe ? "已赞" : "点赞"}
+          <audio controls src={song.audioUrl} onPlay={() => onPlay(song)} onError={() => onAudioError(song)} />
+        </div>
+        <div className="marketplace-card-footer">
+          <button className="challenge-chip" type="button" onClick={() => onJoinChallenge(song)}>
+            参加挑战
           </button>
-          <button type="button" onClick={() => onOpenComments(song)}>评论</button>
-          <button type="button" onClick={() => onShare(song)}>分享</button>
-          <button type="button" onClick={() => onPromote(song)}>推广</button>
-          <button type="button" onClick={() => onJoinChallenge(song)}>参加挑战</button>
         </div>
       </div>
     </article>
@@ -2339,6 +2381,8 @@ function ProfilePage({
   songs,
   rewards,
   tasks,
+  likedSongs,
+  favoriteSongs,
   apiBase,
   onOpen,
   onOpenRewards,
@@ -2352,8 +2396,10 @@ function ProfilePage({
   songs: Song[];
   rewards: RewardHistory;
   tasks: MusicTask[];
+  likedSongs: FeedItem[];
+  favoriteSongs: FeedItem[];
   apiBase: string;
-  onOpen: (song: Song) => void;
+  onOpen: (song: Song | FeedItem) => void;
   onOpenRewards: () => void;
   onOpenSettings: () => void;
   onRefresh: () => Promise<void>;
@@ -2414,6 +2460,16 @@ function ProfilePage({
           </div>
         )}
       </section>
+      <section className="glass-card social-library-panel">
+        <div className="section-heading">
+          <h2>喜欢与收藏</h2>
+          <span>{likedSongs.length + favoriteSongs.length} 首</span>
+        </div>
+        <div className="social-library-grid">
+          <MiniSongCollection title="喜欢列表" emptyText="在广场点击封面上的喜欢按钮后会出现在这里。" songs={likedSongs} onOpen={onOpen} />
+          <MiniSongCollection title="收藏列表" emptyText="点星标收藏的作品会保存到这里。" songs={favoriteSongs} onOpen={onOpen} />
+        </div>
+      </section>
       <section className="glass-card account-panel">
         <div className="section-heading">
           <h2>连接信息</h2>
@@ -2425,6 +2481,39 @@ function ProfilePage({
         </button>
       </section>
     </section>
+  );
+}
+
+function MiniSongCollection({
+  title,
+  emptyText,
+  songs,
+  onOpen
+}: {
+  title: string;
+  emptyText: string;
+  songs: FeedItem[];
+  onOpen: (song: FeedItem) => void;
+}) {
+  return (
+    <div className="mini-song-collection">
+      <h3>{title}</h3>
+      {songs.length === 0 ? (
+        <p>{emptyText}</p>
+      ) : (
+        <div className="mini-song-list">
+          {songs.slice(0, 4).map((song) => (
+            <button key={song.id} type="button" onClick={() => onOpen(song)}>
+              <CoverArt title={song.title} coverUrl={song.coverUrl} />
+              <span>
+                <strong>{song.title}</strong>
+                <small>{displayNameLabel(song.creatorName)} · {formatCompact(song.playCount ?? 0)} 播放</small>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
