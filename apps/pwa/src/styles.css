@@ -1406,6 +1406,29 @@ select:focus {
   scroll-snap-type: y proximity;
 }
 
+.marketplace-page.reel-page {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  min-height: calc(100svh - 124px - env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+.marketplace-reel-topline {
+  padding: 0 2px;
+}
+
+.marketplace-reel-feed {
+  height: calc(100svh - 178px - env(safe-area-inset-bottom));
+  min-height: 560px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scroll-padding: 0;
+  gap: 12px;
+  padding: 0 2px 8px;
+}
+
 .empty-gallery {
   min-height: 340px;
   padding: 22px;
@@ -1474,6 +1497,15 @@ select:focus {
   scroll-snap-align: start;
   position: relative;
   overflow: hidden;
+}
+
+.marketplace-reel-card {
+  min-height: calc(100svh - 186px - env(safe-area-inset-bottom));
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  align-content: stretch;
+  gap: 14px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .reel-card::before {
@@ -2287,8 +2319,21 @@ select:focus {
   box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.035);
 }
 
+.marketplace-card.marketplace-reel-card {
+  min-height: calc(100svh - 186px - env(safe-area-inset-bottom));
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  align-content: stretch;
+  gap: 14px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 .marketplace-cover-shell {
   position: relative;
+}
+
+.marketplace-reel-card .marketplace-cover-shell {
+  min-height: 0;
 }
 
 .marketplace-cover {
@@ -2302,6 +2347,11 @@ select:focus {
 
 .marketplace-cover .cover-art {
   border-radius: 22px;
+}
+
+.marketplace-reel-card .marketplace-cover .cover-art {
+  border-radius: 34px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
 }
 
 .marketplace-cover span {
@@ -2325,6 +2375,12 @@ select:focus {
   pointer-events: none;
 }
 
+.marketplace-reel-card .cover-social-actions {
+  position: static;
+  align-self: center;
+  pointer-events: auto;
+}
+
 .cover-social {
   min-width: 58px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -2340,6 +2396,41 @@ select:focus {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
   cursor: pointer;
   pointer-events: auto;
+}
+
+.marketplace-reel-card .cover-social {
+  min-width: 58px;
+  border: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  gap: 5px;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.marketplace-reel-card .cover-social strong {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  line-height: 1;
+  color: rgba(244, 241, 232, 0.96);
+  background: rgba(2, 17, 13, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.32);
+}
+
+.marketplace-reel-card .cover-social span {
+  color: rgba(244, 241, 232, 0.78);
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1.08;
+  text-align: center;
+  max-width: 62px;
 }
 
 .cover-social span {
@@ -2362,12 +2453,31 @@ select:focus {
   text-shadow: 0 0 18px rgba(255, 107, 134, 0.42);
 }
 
+.marketplace-reel-card .cover-social.like strong {
+  color: #ff6b86;
+  text-shadow: 0 0 18px rgba(255, 107, 134, 0.42);
+}
+
+.marketplace-reel-card .cover-social.like span {
+  color: rgba(244, 241, 232, 0.78);
+  text-shadow: none;
+}
+
 .cover-social.comment span,
 .cover-social.share span {
   color: rgba(244, 241, 232, 0.95);
 }
 
+.marketplace-reel-card .cover-social.comment strong,
+.marketplace-reel-card .cover-social.share strong {
+  color: rgba(244, 241, 232, 0.95);
+}
+
 .cover-social.favorite span {
+  color: var(--accent);
+}
+
+.marketplace-reel-card .cover-social.favorite strong {
   color: var(--accent);
 }
 
@@ -2381,6 +2491,17 @@ select:focus {
 .cover-social.active small {
   color: #041a15;
   text-shadow: none;
+}
+
+.marketplace-reel-card .cover-social.active strong {
+  color: #041a15;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  text-shadow: none;
+}
+
+.marketplace-reel-card .cover-social.active span {
+  color: var(--secondary);
 }
 
 .marketplace-card-body {
@@ -2409,6 +2530,16 @@ select:focus {
   border-radius: 22px;
   padding: 8px;
   background: rgba(2, 17, 13, 0.48);
+}
+
+.marketplace-reel-card .marketplace-player-strip {
+  grid-template-columns: 54px minmax(0, 1fr) 50px;
+  border-color: rgba(255, 216, 122, 0.18);
+  background: rgba(22, 13, 7, 0.62);
+}
+
+.marketplace-reel-card .marketplace-card-footer {
+  margin-top: -4px;
 }
 
 .marketplace-player-strip audio {
@@ -3492,11 +3623,29 @@ select:focus {
     font-size: 12px;
   }
 
+  .marketplace-page.reel-page {
+    min-height: calc(100svh - 104px - env(safe-area-inset-bottom));
+    gap: 8px;
+  }
+
+  .marketplace-reel-feed {
+    height: calc(100svh - 154px - env(safe-area-inset-bottom));
+    min-height: 0;
+    gap: 10px;
+    padding-bottom: 4px;
+  }
+
   .reel-card {
     min-height: calc(100svh - 116px - env(safe-area-inset-bottom));
     padding: 14px;
     border-radius: 28px;
     gap: 12px;
+  }
+
+  .marketplace-card.marketplace-reel-card {
+    min-height: calc(100svh - 164px - env(safe-area-inset-bottom));
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    gap: 10px;
   }
 
   .reel-cover-wrap {
@@ -3509,9 +3658,24 @@ select:focus {
     width: min(63vw, 270px);
   }
 
+  .marketplace-reel-card .marketplace-cover .cover-art {
+    border-radius: 28px;
+  }
+
   .reel-actions {
     gap: 10px;
     align-self: center;
+  }
+
+  .marketplace-reel-card .cover-social strong {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .marketplace-reel-card .cover-social span {
+    max-width: 54px;
+    font-size: 10px;
   }
 
   .reel-actions strong {
@@ -3546,6 +3710,11 @@ select:focus {
 
   .reel-player audio {
     height: 30px;
+  }
+
+  .marketplace-reel-card .marketplace-player-strip {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    padding: 8px;
   }
 
   .marketplace-title {

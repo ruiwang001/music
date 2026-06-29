@@ -1652,20 +1652,13 @@ function GalleryPage({
   onJoinChallenge: (song: FeedItem) => void;
   onAudioError: (song: FeedItem) => void;
 }) {
-  const sections = [
-    { title: "今日热门", body: "真实播放和收藏正在上升的 AI 歌曲。", songs: feed.filter((song, index) => (song as MarketplaceSong).lane === "hot" || index < 2) },
-    { title: "新人新歌", body: "刚发布的新作品，适合抢先评论和收藏。", songs: feed.filter((song) => (song as MarketplaceSong).lane === "new") },
-    { title: "挑战赛作品", body: "正在参加本周主题赛的公开作品。", songs: feed.filter((song) => (song as MarketplaceSong).lane === "challenge") },
-    { title: "推荐给你", body: "根据风格和互动表现进入推荐池。", songs: feed.filter((song) => (song as MarketplaceSong).lane === "recommended") }
-  ].filter((section) => section.songs.length > 0);
-
   return (
-    <section className="page gallery-page marketplace-page">
-      <div className="page-title-row marketplace-title">
-        <div>
-          <p className="gold-label">Green Sonic Marketplace</p>
-          <h1>音乐广场</h1>
-          <p>发现 AI 音乐创作者的新作品，播放、收藏、评论都会影响创作者积分预估。</p>
+    <section className="page gallery-page reel-page marketplace-page">
+      <div className="reel-topline marketplace-reel-topline">
+        <span>音乐广场</span>
+        <div className="reel-dots" aria-hidden="true">
+          <i />
+          <i />
         </div>
         <button className="ghost-button" type="button" onClick={() => void onRefresh()} disabled={busy}>
           {busy ? "刷新中" : "刷新"}
@@ -1691,35 +1684,22 @@ function GalleryPage({
           </div>
         </section>
       ) : (
-        <div className="marketplace-sections">
-          {sections.map((section) => (
-            <section className="marketplace-section glass-card" key={section.title}>
-              <div className="section-heading">
-                <div>
-                  <h2>{section.title}</h2>
-                  <p>{section.body}</p>
-                </div>
-                <span>{section.songs.length} 首</span>
-              </div>
-              <div className="marketplace-grid">
-                {section.songs.map((song) => (
-                  <MarketplaceCard
-                    key={song.id}
-                    song={song}
-                    currentUserId={currentUserId}
-                    onOpen={onOpen}
-                    onOpenComments={onOpenComments}
-                    onShare={onShare}
-                    onOpenCreator={onOpenCreator}
-                    onLike={onLike}
-                    onFavorite={onFavorite}
-                    onPlay={onPlay}
-                    onJoinChallenge={onJoinChallenge}
-                    onAudioError={onAudioError}
-                  />
-                ))}
-              </div>
-            </section>
+        <div className="reel-feed marketplace-reel-feed" aria-label="上下滑动浏览音乐作品">
+          {feed.map((song) => (
+            <MarketplaceCard
+              key={song.id}
+              song={song}
+              currentUserId={currentUserId}
+              onOpen={onOpen}
+              onOpenComments={onOpenComments}
+              onShare={onShare}
+              onOpenCreator={onOpenCreator}
+              onLike={onLike}
+              onFavorite={onFavorite}
+              onPlay={onPlay}
+              onJoinChallenge={onJoinChallenge}
+              onAudioError={onAudioError}
+            />
           ))}
         </div>
       )}
@@ -1757,21 +1737,20 @@ function MarketplaceCard({
     : Math.max(0, Math.round((song.playCount ?? 0) * 0.18 + song.likesCount * 4 + song.commentsCount * 5));
 
   return (
-    <article className="marketplace-card">
-      <div className="marketplace-cover-shell">
-        <button className="marketplace-cover" type="button" onClick={() => onOpen(song)}>
+    <article className="reel-card marketplace-card marketplace-reel-card">
+      <div className="reel-cover-wrap marketplace-cover-shell">
+        <button className="reel-cover marketplace-cover" type="button" onClick={() => onOpen(song)} aria-label={`打开《${song.title}》详情`}>
           <CoverArt title={song.title} coverUrl={song.coverUrl} />
-          <span>播放</span>
         </button>
-        <div className="cover-social-actions" aria-label="作品快捷互动">
+        <div className="reel-actions cover-social-actions" aria-label="作品快捷互动">
           <button
             className={`cover-social like ${song.likedByMe ? "active" : ""}`}
             type="button"
             onClick={() => onLike(song)}
             aria-label={song.likedByMe ? "取消喜欢" : "喜欢这首歌"}
           >
-            <span>♥</span>
-            <small>{formatCompact(song.likesCount)}</small>
+            <strong>♥</strong>
+            <span>{formatCompact(song.likesCount)}</span>
           </button>
           <button
             className="cover-social comment"
@@ -1779,8 +1758,8 @@ function MarketplaceCard({
             onClick={() => onOpenComments(song)}
             aria-label="查看评论"
           >
-            <span>◌</span>
-            <small>{formatCompact(song.commentsCount)}</small>
+            <strong>◌</strong>
+            <span>{formatCompact(song.commentsCount)}</span>
           </button>
           <button
             className={`cover-social favorite ${song.favoritedByMe ? "active" : ""}`}
@@ -1788,8 +1767,8 @@ function MarketplaceCard({
             onClick={() => onFavorite(song)}
             aria-label={song.favoritedByMe ? "取消收藏" : "收藏这首歌"}
           >
-            <span>★</span>
-            <small>{song.favoritedByMe ? "已收藏" : "收藏"}</small>
+            <strong>★</strong>
+            <span>{song.favoritedByMe ? "已收藏" : "收藏"}</span>
           </button>
           <button
             className="cover-social share"
@@ -1797,12 +1776,12 @@ function MarketplaceCard({
             onClick={() => onShare(song)}
             aria-label="分享歌曲"
           >
-            <span>↗</span>
-            <small>分享</small>
+            <strong>↗</strong>
+            <span>分享</span>
           </button>
         </div>
       </div>
-      <div className="marketplace-card-body">
+      <div className="reel-caption marketplace-card-body">
         <button className="creator-chip" type="button" onClick={() => onOpenCreator(song.userId)}>
           <span>{displayInitial(song.creatorName)}</span>
           <strong>{displayNameLabel(song.creatorName)}</strong>
@@ -1816,10 +1795,14 @@ function MarketplaceCard({
           <span>{formatCompact(song.likesCount)} 点赞</span>
           <span>{formatPoints(creatorPoints)} 积分</span>
         </div>
-        <div className="marketplace-player-strip">
-          <button className="marketplace-play-button" type="button" onClick={() => onOpen(song)}>
-            <span>▶</span>
-            播放详情
+        <div className="reel-player marketplace-player-strip">
+          <CoverArt title={song.title} coverUrl={song.coverUrl} />
+          <button type="button" onClick={() => onOpen(song)}>
+            <strong>{song.title}</strong>
+            <span>{displayNameLabel(song.creatorName)} · {formatCompact(song.playCount ?? 0)} 播放</span>
+          </button>
+          <button className="reel-play-button" type="button" onClick={() => onOpen(song)} aria-label="打开详情">
+            详情
           </button>
           <audio controls src={song.audioUrl} onPlay={() => onPlay(song)} onError={() => onAudioError(song)} />
         </div>
